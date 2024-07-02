@@ -1,0 +1,3 @@
+---
+# defaults file for deploy-webmin
+webmin_port: 10000

@@ -1,0 +1,24 @@
+[Unit]
+Description=container Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker exec {{ item.container_name }} stop
+ExecStartPre=-/usr/bin/docker rm {{ item.container_name }}
+ExecStartPre=/usr/bin/docker pull {{ item.container_image }}
+ExecStartPre=/usr/bin/docker network create --subnet={{ item.subnet }} {{ item.network_name }}
+
+ExecStart=/usr/bin/docker run --rm --name {{ item.container_name }} \
+    --net {{ item.network_name }} \
+    -v {{base_directory}}/{{ item.container_name }}/volumes:/opt/{{ item.container_name }}/data \
+    -v {{base_directory}}/{{ item.container_name }}/config:/opt/{{ item.container_name }}/conf \
+    -v {{base_directory}}/{{ item.container_name }}/logs:/opt/{{ item.container_name }}/logs \
+    -v {{base_directory}}/{{ item.container_name }}/backups:/opt/{{ item.container_name }}/backups \
+    -p {{ item.container_ports }} \
+    {{ item.container_image }}
+
+[Install]
+WantedBy=default.target

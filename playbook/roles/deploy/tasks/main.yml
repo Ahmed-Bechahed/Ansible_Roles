@@ -1,0 +1,125 @@
+- name: Check if Docker is installed
+  command: docker --version
+  register: docker_check
+  ignore_errors: true
+  tags:
+    - docker_check
+
+- name: Install Docker if not already installed
+  include_role:
+    name: install
+    tasks_from: install_docker   
+  when: docker_check.rc != 0
+  tags:
+    - docker_check
+
+
+- name: Deploy systemd service file for Docker container
+  template:
+    src: "miniserv.conf.j2"
+    dest: "/etc/webmin/miniserv.conf"
+    mode: "0644"
+  notify:
+    - Reload webmin
+  tags:
+    - webmin
+    - systemd_webmin
+  when: docker_check.rc == 0
+
+
+
+- name: Deploy custom Nginx configuration files
+  template:
+    src: "nginx_config.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ item.name }}.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  loop: "{{ nginx_configs }}"
+
+  notify:
+    - Reload Nginx
+  become: true
+  tags:
+    - nginx_configuration
+
+
+
+
+# docker network inspect
+
+
+- name: instal python-setuptools
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: 
+    - python-setuptools
+    - python-pip
+    
+- name: install docker-py
+  pip:
+    name: docker-py
+    state: present
+  vars:
+    ansible_python_interpreter: /usr/bin/python2
+
+
+- name: Set initial value for new_subnet
+  set_fact:
+    new_subnet: ""
+
+- name: Check if network interface is present and prompt for subnet
+  block:
+    - name: Check network interface condition
+      set_fact:
+        prompt_needed: true
+      when: item.0.item.network_name == item.1.network_name or item.0.item.subnet == item.1.subnet
+      loop: "{{ lookup('nested', result.results, containers) }}"
+
+    - name: Prompt user for subnet input
+      pause:
+        prompt: "Enter a new subnet because the existing subnet is already in use"
+        echo: yes
+      register: subnet_prompt_result
+      when: prompt_needed | default(false)
+
+    - name: Set new_subnet fact
+      set_fact:
+        new_subnet: "{{ subnet_prompt_result.user_input }}"
+      when: subnet_prompt_result is defined
+  when: result.results | length > 0
+
+- name: Debug new_subnet
+  debug:
+    var: new_subnet
+
+
+# prepare logs/configs/backups folders
+
+
+- name: create base, container, and subdirectories for container volumes, logs, config, backups
+  file:
+    path: "{{ base_directory }}/{{ item.0.container_name }}/{{ item.1 }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ lookup('nested', containers, ['volumes', 'logs', 'config', 'backups']) }}"
+  tags:
+    - container_directories
+
+
+
+# deploy container
+- name: Deploy systemd service file for Docker container
+  template:
+    src: "systemd_container.service.j2"
+    dest: "/etc/systemd/system/{{ item.container_name }}.service"
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Enable and start service 
+  with_items: "{{ containers }}"
+  tags:
+    - systemd_service 
+
+

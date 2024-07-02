@@ -1,0 +1,26 @@
+   # webmin_vars 
+    webmin_port: 10001
+    # container_d vars
+    containers:
+      - container_name: "mynginx_3"
+        container_image: "nginx"
+        container_ports: "8090:80"
+        subnet: "172.16.1.0/24"
+        network_name: "nginx_network"
+      - container_name: "mywordpress_3"
+        container_image: "wordpress"
+        container_ports: "8010:80"
+        subnet: "172.16.2.0/24"
+        network_name: "wordpress_network"
+    # nginx vars
+    nginx_configs:
+      - name: nginx_config1
+        server_name: example.com
+        proxy_pass: http://backend1
+      - name: nginx_config2
+        server_name: test.com
+        proxy_pass: http://backend2
+
+    portainer_credentials:
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASS: "admin1234567890"
