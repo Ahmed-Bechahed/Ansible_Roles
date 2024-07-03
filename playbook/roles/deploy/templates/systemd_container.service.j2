@@ -9,10 +9,10 @@ Restart=always
 ExecStartPre=-/usr/bin/docker exec {{ item.container_name }} stop
 ExecStartPre=-/usr/bin/docker rm {{ item.container_name }}
 ExecStartPre=/usr/bin/docker pull {{ item.container_image }}
-ExecStartPre=/usr/bin/docker network create --subnet={{ item.subnet }} {{ item.network_name }}
+#ExecStartPre=/usr/bin/docker network create --subnet={{ subnet }} {{ network_name }}
 
 ExecStart=/usr/bin/docker run --rm --name {{ item.container_name }} \
-    --net {{ item.network_name }} \
+    --net {{ network_name }} \
     -v {{base_directory}}/{{ item.container_name }}/volumes:/opt/{{ item.container_name }}/data \
     -v {{base_directory}}/{{ item.container_name }}/config:/opt/{{ item.container_name }}/conf \
     -v {{base_directory}}/{{ item.container_name }}/logs:/opt/{{ item.container_name }}/logs \

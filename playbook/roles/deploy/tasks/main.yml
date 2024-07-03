@@ -49,7 +49,7 @@
 # docker network inspect
 
 
-- name: instal python-setuptools
+- name: instal docker-info pre-requisites
   apt:
     name: "{{ item }}"
     state: present
@@ -64,35 +64,60 @@
   vars:
     ansible_python_interpreter: /usr/bin/python2
 
+- name: Get infos on network
+  docker_network_info:
+    name: "{{ network_name }}"
+  register: network_info
 
-- name: Set initial value for new_subnet
+
+- name: Set initial value for subnet_exist
   set_fact:
-    new_subnet: ""
+    subnet_exist: false
 
-- name: Check if network interface is present and prompt for subnet
-  block:
-    - name: Check network interface condition
+- name: check if subnet exist
+  block: 
+    - name: update subnet_exist value
       set_fact:
-        prompt_needed: true
-      when: item.0.item.network_name == item.1.network_name or item.0.item.subnet == item.1.subnet
-      loop: "{{ lookup('nested', result.results, containers) }}"
+        subnet_exist: true
+      when: "{{ item.Subnet ==  subnet }}"
+      with_items: "{{ network_info.network.IPAM.Config }}"
+  when: network_info.exists == true
+  
 
-    - name: Prompt user for subnet input
+- name: Check if network name and subnet are present and prompt
+  block:
+
+    - name: Prompt user for network input
+      pause:
+        prompt: "Enter a new network because the existing network is already in use"
+        echo: yes
+      register: network_prompt_result
+
+    - name: Set new_network fact
+      set_fact:
+        network_name: "{{ network_prompt_result.user_input }}"
+      when: network_prompt_result is defined
+
+    - name: Prompt user for network input
       pause:
         prompt: "Enter a new subnet because the existing subnet is already in use"
         echo: yes
       register: subnet_prompt_result
-      when: prompt_needed | default(false)
 
-    - name: Set new_subnet fact
+    - name: Update subnet to new entered subnet
       set_fact:
-        new_subnet: "{{ subnet_prompt_result.user_input }}"
-      when: subnet_prompt_result is defined
-  when: result.results | length > 0
+        subnet: "{{ subnet_prompt_result.user_input }}" 
+      when: subnet_prompt_result.user_input != ""
 
-- name: Debug new_subnet
-  debug:
-    var: new_subnet
+  when: network_info.exists == true and subnet_exist == true
+
+
+- name: Ensure the Docker network exists
+  docker_network:
+    name: "{{ network_name }}"
+    ipam_config:
+      - subnet: "{{ subnet }}"
+    state: present
 
 
 # prepare logs/configs/backups folders
@@ -110,6 +135,7 @@
 
 
 # deploy container
+
 - name: Deploy systemd service file for Docker container
   template:
     src: "systemd_container.service.j2"

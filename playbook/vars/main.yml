@@ -1,17 +1,16 @@
    # webmin_vars 
     webmin_port: 10001
     # container_d vars
+    subnet: "172.16.2.0/24"
+    network_name: "myapp_network"
     containers:
       - container_name: "mynginx_3"
         container_image: "nginx"
         container_ports: "8090:80"
-        subnet: "172.16.1.0/24"
-        network_name: "nginx_network"
-      - container_name: "mywordpress_3"
-        container_image: "wordpress"
-        container_ports: "8010:80"
-        subnet: "172.16.2.0/24"
-        network_name: "wordpress_network"
+      - container_name: "mynginx_4"
+        container_image: "nginx"
+        container_ports: "8070:80"
+       
     # nginx vars
     nginx_configs:
       - name: nginx_config1
