@@ -4,6 +4,8 @@
   ignore_errors: true
   tags:
     - docker_check
+    - systemd_service 
+    - network_subnet
 
 - name: Install Docker if not already installed
   include_role:
@@ -12,6 +14,8 @@
   when: docker_check.rc != 0
   tags:
     - docker_check
+    - systemd_service 
+    - network_subnet
 
 
 - name: Deploy systemd service file for Docker container
@@ -24,7 +28,7 @@
   tags:
     - webmin
     - systemd_webmin
-  when: docker_check.rc == 0
+
 
 
 
@@ -63,16 +67,23 @@
     state: present
   vars:
     ansible_python_interpreter: /usr/bin/python2
+  tags:
+    - docker-py
 
 - name: Get infos on network
   docker_network_info:
     name: "{{ network_name }}"
   register: network_info
-
+  tags:
+    - network_subnet
+    - systemd_service
 
 - name: Set initial value for subnet_exist
   set_fact:
     subnet_exist: false
+  tags:
+    - network_subnet
+    - systemd_service
 
 - name: check if subnet exist
   block: 
@@ -82,7 +93,9 @@
       when: "{{ item.Subnet ==  subnet }}"
       with_items: "{{ network_info.network.IPAM.Config }}"
   when: network_info.exists == true
-  
+  tags:
+    - network_subnet
+    - systemd_service
 
 - name: Check if network name and subnet are present and prompt
   block:
@@ -110,7 +123,9 @@
       when: subnet_prompt_result.user_input != ""
 
   when: network_info.exists == true and subnet_exist == true
-
+  tags:
+    - network_subnet
+    - systemd_service
 
 - name: Ensure the Docker network exists
   docker_network:
@@ -118,7 +133,9 @@
     ipam_config:
       - subnet: "{{ subnet }}"
     state: present
-
+  tags:
+    - network_subnet
+    - systemd_service
 
 # prepare logs/configs/backups folders
 
@@ -131,6 +148,7 @@
   loop: "{{ lookup('nested', containers, ['volumes', 'logs', 'config', 'backups']) }}"
   tags:
     - container_directories
+    - systemd_service
 
 
 

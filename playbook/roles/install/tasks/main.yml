@@ -10,13 +10,13 @@
     name: portainer
     image: portainer/portainer
     ports:
-      - "9000:9000"
+      - "{{ portainer_port }}:9000"
     volumes:
       - portainer_data:/data
     restart_policy: always
     env:
       ADMIN_USERNAME: "{{ portainer_credentials.ADMIN_USERNAME }}"
-      ADMIN_PASS: "{{ portainer_credentials.ADMIN_PASS }}" # Replace with your desired password 
+      ADMIN_PASS: "{{ portainer_credentials.ADMIN_PASS }}" 
   become: true
   tags:
     - portainer
@@ -31,13 +31,13 @@
   tags:
     - nginx
 
-# tasks file for deploy-webmin
-- name: Install python-apt
-  apt:
-    name: python3-apt
-    state: present
-  tags:
-    - webmin
+# # tasks file for deploy-webmin
+# - name: Install python-apt
+#   apt:
+#     name: python3-apt
+#     state: present
+#   tags:
+#     - webmin
 
 
 - name: Install prerequisites
@@ -49,6 +49,7 @@
       - libauthen-pam-perl
       - libpam-runtime
       - libio-pty-perl
+      - apt-show-versions
       - python3
       - libwww-perl
       - liblwp-protocol-https-perl
