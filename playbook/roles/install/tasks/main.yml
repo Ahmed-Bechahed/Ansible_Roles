@@ -4,22 +4,23 @@
   include_tasks: install_docker.yml
   tags:
     - docker_installation
+    - debug_cont
 
-- name: Install Portainer Docker container
-  docker_container:
-    name: portainer
-    image: portainer/portainer
-    ports:
-      - "{{ portainer_port }}:9000"
-    volumes:
-      - portainer_data:/data
-    restart_policy: always
-    env:
-      ADMIN_USERNAME: "{{ portainer_credentials.ADMIN_USERNAME }}"
-      ADMIN_PASS: "{{ portainer_credentials.ADMIN_PASS }}" 
-  become: true
-  tags:
-    - portainer
+# - name: Install Portainer Docker container
+#   docker_container:
+#     name: portainer
+#     image: portainer/portainer
+#     ports:
+#       - "{{ portainer_port }}:9000"
+#     volumes:
+#       - portainer_data:/data
+#     restart_policy: always
+#     env:
+#       ADMIN_USERNAME: "{{ portainer_credentials.ADMIN_USERNAME }}"
+#       ADMIN_PASS: "{{ portainer_credentials.ADMIN_PASS }}" 
+#   become: true
+#   tags:
+#     - portainer
 
   
 
