@@ -22,7 +22,7 @@
 # For TEST purpose
 - name: debug docker image 
   debug:
-    msg: "{{ docker_image }}"
+    msg: "{{ container_image }}"
   tags:
     - debug_cont
 
