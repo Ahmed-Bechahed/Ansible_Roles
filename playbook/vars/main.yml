@@ -2,6 +2,7 @@
     #webmin_port: 10001
     portainer_port: 9000
     # container_d vars
+    container_image: "hjaiejhjaiej"
     subnet: "172.16.2.0/24"
     network_name: "myapp_network"
     containers:
