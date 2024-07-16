@@ -1,5 +1,5 @@
 - name: Deploy Docker and Nginx with custom configurations
-  hosts: azure_vms
+  hosts: all
   become: true  # Ensure sudo or root privileges are used
   vars_files:
     - vars/main.yml
