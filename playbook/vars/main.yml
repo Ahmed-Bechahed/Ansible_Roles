@@ -2,6 +2,7 @@
     #webmin_port: 10001
     portainer_port: 9000
     # container_d vars
+    container_image: "nginx"
     subnet: "172.16.2.0/24"
     network_name: "myapp_network"
     containers:
@@ -11,8 +12,6 @@
       - container_name: "mynginx_4"
         container_image: "nginx"
         container_ports: "8070:80"
-
-    container_image: "nginx"
        
     # nginx vars
     nginx_configs:
