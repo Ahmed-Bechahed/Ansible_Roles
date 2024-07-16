@@ -11,6 +11,8 @@
       - container_name: "mynginx_4"
         container_image: "nginx"
         container_ports: "8070:80"
+
+   container_image: "nginx"
        
     # nginx vars
     nginx_configs:
