@@ -6,6 +6,7 @@
     - docker_check
     - systemd_service 
     - network_subnet
+    - debug_cont
 
 - name: Install Docker if not already installed
   include_role:
@@ -16,6 +17,7 @@
     - docker_check
     - systemd_service 
     - network_subnet
+    - debug_cont
 
 # For TEST purpose
 - name: debug docker image 
