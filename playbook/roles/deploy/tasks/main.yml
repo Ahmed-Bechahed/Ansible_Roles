@@ -17,6 +17,13 @@
     - systemd_service 
     - network_subnet
 
+# For TEST purpose
+- name: debug docker image 
+  debug:
+    msg: "{{ docker_image }}"
+  tags:
+    - debug_cont
+
 
 - name: Deploy systemd service file for Docker container
   template:
