@@ -5,5 +5,5 @@
     - vars/main.yml
 
   roles: 
-    - install 
+    #- install 
     - deploy
