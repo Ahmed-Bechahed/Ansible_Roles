@@ -1,3 +1,4 @@
 ---
 # defaults file for deploy-webmin
+base_directory: '/var/containers/container_name/'
 webmin_port: 10000
