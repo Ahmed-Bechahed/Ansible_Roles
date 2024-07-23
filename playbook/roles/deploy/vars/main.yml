@@ -1,2 +1,3 @@
 ---
 # vars file for deploy-webmin
+base_directory: "/var/containers/"
