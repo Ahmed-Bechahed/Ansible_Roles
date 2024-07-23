@@ -27,34 +27,34 @@
     - debug_cont
 
 
-- name: Deploy systemd service file for Docker container
-  template:
-    src: "miniserv.conf.j2"
-    dest: "/etc/webmin/miniserv.conf"
-    mode: "0644"
-  notify:
-    - Reload webmin
-  tags:
-    - webmin
-    - systemd_webmin
+# - name: Deploy systemd service file for Docker container
+#   template:
+#     src: "miniserv.conf.j2"
+#     dest: "/etc/webmin/miniserv.conf"
+#     mode: "0644"
+#   notify:
+#     - Reload webmin
+#   tags:
+#     - webmin
+#     - systemd_webmin
 
 
 
 
-- name: Deploy custom Nginx configuration files
-  template:
-    src: "nginx_config.conf.j2"
-    dest: "/etc/nginx/conf.d/{{ item.name }}.conf"
-    owner: "root"
-    group: "root"
-    mode: 0644
-  loop: "{{ nginx_configs }}"
+# - name: Deploy custom Nginx configuration files
+#   template:
+#     src: "nginx_config.conf.j2"
+#     dest: "/etc/nginx/conf.d/{{ item.name }}.conf"
+#     owner: "root"
+#     group: "root"
+#     mode: 0644
+#   loop: "{{ nginx_configs }}"
 
-  notify:
-    - Reload Nginx
-  become: true
-  tags:
-    - nginx_configuration
+#   notify:
+#     - Reload Nginx
+#   become: true
+#   tags:
+#     - nginx_configuration
 
 
 
