@@ -3,7 +3,7 @@
     portainer_port: 9000
     # container_d vars
     container_image: "hjaiejhjaiej"
-    subnet: "172.16.9.0/24"
+    subnet: "172.16.10.0/24"
     network_name: "myapp_network"
     containers:
       - container_name: "mynginx_3"
