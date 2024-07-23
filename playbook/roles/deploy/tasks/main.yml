@@ -70,14 +70,14 @@
 #     - python-setuptools
 #     - python-pip
     
-# - name: install docker-py
-#   pip:
-#     name: docker-py
-#     state: present
-#   vars:
-#     ansible_python_interpreter: /usr/bin/python2
-#   tags:
-#     - docker-py
+- name: install docker-py
+  pip:
+    name: docker-py
+    state: present
+  # vars:
+  #   ansible_python_interpreter: /usr/bin/python2
+  tags:
+    - docker-py
 
 - name: Get infos on network
   docker_network_info:
