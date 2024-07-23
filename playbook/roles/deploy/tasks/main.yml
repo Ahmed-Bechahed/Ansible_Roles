@@ -7,7 +7,13 @@
     - systemd_service 
     - network_subnet
     - debug_cont
-
+    
+#NEW ADDED    
+- name: Ensure pip3 is installed
+  apt:
+    name: python3-pip
+    state: present
+    
 - name: Install Docker if not already installed
   include_role:
     name: install
