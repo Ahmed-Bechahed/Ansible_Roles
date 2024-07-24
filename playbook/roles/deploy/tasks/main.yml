@@ -3,103 +3,58 @@
   register: docker_check
   ignore_errors: true
   tags:
-    - docker_check
-    - systemd_service 
-    - network_subnet
-    - debug_cont
+    - docker
     
-#NEW ADDED    
-- name: Ensure pip3 is installed
-  apt:
-    name: python3-pip
-    state: present
-    
+
 - name: Install Docker if not already installed
   include_role:
     name: install
     tasks_from: install_docker   
   when: docker_check.rc != 0
   tags:
-    - docker_check
-    - systemd_service 
-    - network_subnet
-    - debug_cont
+    - docker
 
-# For TEST purpose
-- name: debug docker image 
-  debug:
-    msg: "{{ container_image }}"
+#Deoply webmin
+- name: Deploy webmin
+  template:
+    src: "miniserv.conf.j2"
+    dest: "/etc/webmin/miniserv.conf"
+    mode: "0644"
+  notify:
+    - Reload webmin
   tags:
-    - debug_cont
+    - webmin
 
-
-# - name: Deploy systemd service file for Docker container
-#   template:
-#     src: "miniserv.conf.j2"
-#     dest: "/etc/webmin/miniserv.conf"
-#     mode: "0644"
-#   notify:
-#     - Reload webmin
-#   tags:
-#     - webmin
-#     - systemd_webmin
-
-
-
-
-# - name: Deploy custom Nginx configuration files
-#   template:
-#     src: "nginx_config.conf.j2"
-#     dest: "/etc/nginx/conf.d/{{ item.name }}.conf"
-#     owner: "root"
-#     group: "root"
-#     mode: 0644
-#   loop: "{{ nginx_configs }}"
-
-#   notify:
-#     - Reload Nginx
-#   become: true
-#   tags:
-#     - nginx_configuration
-
-
-
-
-# docker network inspect
-
-
-# - name: instal docker-info pre-requisites
-#   apt:
-#     name: "{{ item }}"
-#     state: present
-#   with_items: 
-#     - python-setuptools
-#     - python-pip
-    
-- name: install docker-py
-  pip:
-    name: docker-py
-    state: present
-  # vars:
-  #   ansible_python_interpreter: /usr/bin/python2
+# Deploy nginx
+- name: Deploy custom Nginx configuration files
+  template:
+    src: "nginx_config.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ item.name }}.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  loop: "{{ nginx_configs }}"
+  notify:
+    - Reload Nginx
+  become: true
   tags:
-    - docker-py
+    - nginx
 
+# Check network name if already exist
 - name: Get infos on network
   docker_network_info:
     name: "{{ network_name }}"
   register: network_info
   tags:
-    - network_subnet
-    - systemd_service
+    - docker
 
 - name: Set initial value for subnet_exist
   set_fact:
     subnet_exist: false
   tags:
-    - network_subnet
-    - systemd_service
+    - docker
 
+# Check subnet if already exist
 - name: check if subnet exist
   block: 
     - name: update subnet_exist value
@@ -109,9 +64,9 @@
       with_items: "{{ network_info.network.IPAM.Config }}"
   when: network_info.exists == true
   tags:
-    - network_subnet
-    - systemd_service
+    - docker
 
+# Prompt to re-enter subnet and network name in case one of them exists
 - name: Check if network name and subnet are present and prompt
   block:
 
@@ -139,9 +94,9 @@
 
   when: network_info.exists == true and subnet_exist == true
   tags:
-    - network_subnet
-    - systemd_service
+    - docker
 
+# Check network creation before launching the containers
 - name: Ensure the Docker network exists
   docker_network:
     name: "{{ network_name }}"
@@ -149,12 +104,9 @@
       - subnet: "{{ subnet }}"
     state: present
   tags:
-    - network_subnet
-    - systemd_service
+    - docker
 
-# prepare logs/configs/backups folders
-
-
+# Prepare logs/configs/backups folders
 - name: create base, container, and subdirectories for container volumes, logs, config, backups
   file:
     path: "{{ base_directory }}/{{ item.0.container_name }}/{{ item.1 }}"
@@ -162,13 +114,11 @@
     mode: '0755'
   loop: "{{ lookup('nested', containers, ['volumes', 'logs', 'config', 'backups']) }}"
   tags:
-    - container_directories
-    - systemd_service
+    - docker
 
 
 
-# deploy container
-
+# Deploy containers
 - name: Deploy systemd service file for Docker container
   template:
     src: "systemd_container.service.j2"
@@ -179,6 +129,6 @@
     - Enable and start service 
   with_items: "{{ containers }}"
   tags:
-    - systemd_service 
+    - docker
 
 

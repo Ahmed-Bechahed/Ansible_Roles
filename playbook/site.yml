@@ -1,9 +1,9 @@
-- name: Deploy Docker and Nginx with custom configurations
-  hosts: all
-  become: true  # Ensure sudo or root privileges are used
+- name: Setup server and deploy apps
+  hosts: test
+  become: true
   vars_files:
     - vars/main.yml
 
   roles: 
-    #- install 
+    - install 
     - deploy

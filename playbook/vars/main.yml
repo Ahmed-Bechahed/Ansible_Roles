@@ -1,8 +1,11 @@
-   # webmin_vars 
-    #webmin_port: 10001
+    # webmin_vars 
+    webmin_port: 10001
+    # Portainer vars
     portainer_port: 9000
+    portainer_credentials:
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASS: "admin1234567890"
     # container_d vars
-    container_image: "hjaiejhjaiej"
     subnet: "172.16.10.0/24"
     network_name: "myapp_network"
     containers:
@@ -12,7 +15,6 @@
       - container_name: "mynginx_4"
         container_image: "nginx"
         container_ports: "8070:80"
-       
     # nginx vars
     nginx_configs:
       - name: nginx_config1
@@ -22,6 +24,4 @@
         server_name: test.com
         proxy_pass: localhost:10000
 
-    portainer_credentials:
-      ADMIN_USERNAME: "admin"
-      ADMIN_PASS: "admin1234567890"
+    
