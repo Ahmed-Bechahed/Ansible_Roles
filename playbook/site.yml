@@ -1,5 +1,5 @@
 - name: Setup server and deploy apps
-  hosts: test
+  hosts: website
   become: true
   vars_files:
     - vars/main.yml
