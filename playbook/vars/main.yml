@@ -6,7 +6,7 @@
       ADMIN_USERNAME: "admin"
       ADMIN_PASS: "admin1234567890"
     # container_d vars
-    subnet: "172.16.10.0/24"
+    subnet: "172.16.30.0/24"
     network_name: "myapp_network"
     containers:
       - container_name: "mynginx_3"
